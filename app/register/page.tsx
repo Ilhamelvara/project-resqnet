@@ -145,14 +145,33 @@ export default function RegisterPage() {
                     />
                     {fieldErrors.confirmPassword && <div className={styles.fieldError}>{fieldErrors.confirmPassword}</div>}
                   </div>
-                  <select 
-                    className={styles.inputField} 
-                    value={role} 
-                    onChange={(e) => setRole(e.target.value)}
-                  >
-                    <option value="USER">Relawan Mandiri (User)</option>
-                    <option value="ORG">Organisasi Bantuan (Org)</option>
-                  </select>
+                  <div className="w-full flex flex-col items-center gap-2 mb-2">
+                    <label className="text-sm font-bold text-[#1a513c] self-start" style={{maxWidth: '320px', margin: '0 auto'}}>Daftar sebagai:</label>
+                    <div className="w-full flex justify-center gap-2" style={{ maxWidth: '320px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setRole('USER')}
+                        className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                          role === 'USER' 
+                            ? 'bg-[#ebb160] text-white border-[#1a513c] shadow-md' 
+                            : 'bg-[#f6ebd8] text-[#555] border-transparent hover:border-[#1a513c]/30'
+                        }`}
+                      >
+                        Relawan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole('ORG')}
+                        className={`flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all border-2 ${
+                          role === 'ORG' 
+                            ? 'bg-[#ebb160] text-white border-[#1a513c] shadow-md' 
+                            : 'bg-[#f6ebd8] text-[#555] border-transparent hover:border-[#1a513c]/30'
+                        }`}
+                      >
+                        Organisasi
+                      </button>
+                    </div>
+                  </div>
 
                   <button type="submit" className={styles.loginBtn} disabled={loading || !!success}>
                     {loading ? 'Memproses...' : 'Daftar'}

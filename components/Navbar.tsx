@@ -42,9 +42,10 @@ export default function Navbar({
 
   const navLinks = [
     { name: 'Beranda', href: '/dashboard' },
-    { name: 'Peta Bencana', href: '/peta' },
+    { name: 'Peta Bencana', href: '/map' },
     { name: 'Donasi', href: '/donasi' },
     { name: 'Eksplor Map', href: '/eksplor' },
+    { name: 'PetaBencana.id', href: '/peta-bencana-id' },
     { name: 'Komunitas', href: '/komunitas' },
   ];
 

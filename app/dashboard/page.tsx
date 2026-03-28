@@ -42,14 +42,29 @@ const DAMAGE_COLORS: Record<string, string> = {
 const DAMAGE_LABELS: Record<string, string> = { light: 'Ringan', medium: 'Sedang', heavy: 'Berat' };
 const COORD_LABELS: Record<string, string> = { evacuation: '🚨 Evakuasi', medical: '🏥 Medis', food: '🍱 Logistik', none: '' };
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'Baru saja';
-  if (m < 60) return `${m} menit lalu`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} jam lalu`;
-  return `${Math.floor(h / 24)} hari lalu`;
+
+function formatDate(dateStr: string) {
+  try {
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(dateStr));
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function formatTime(dateStr: string) {
+  try {
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(dateStr));
+  } catch (e) {
+    return dateStr;
+  }
 }
 
 // ---- PostCard with real data ----
@@ -77,11 +92,11 @@ function ReportPostCard({ report, onUpvote, onDelete, currentUserId }: {
           <div>
             <h3 className="text-xl font-bold text-[#1a513c] leading-tight">{report.title}</h3>
             <div className="text-sm text-gray-700 font-semibold mt-1 flex items-center gap-2 flex-wrap">
-              <span>{category}</span>
+              <span>{formatTime(report.createdAt)}</span>
               <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
               <span>{report.user?.name || 'Anonim'}</span>
               <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-              <span>{timeAgo(report.createdAt)}</span>
+              <span>{formatDate(report.createdAt)}</span>
             </div>
           </div>
         </div>
