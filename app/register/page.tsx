@@ -5,6 +5,7 @@ import styles from '../login/login.module.css';
 import { useRouter } from 'next/navigation';
 import api from '../../utils/api';
 import Link from 'next/link';
+import { mapBackendError } from '../../utils/errorMapper';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -13,6 +14,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('USER');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -21,11 +23,12 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setSuccess('');
     setLoading(true);
 
     if (password !== confirmPassword) {
-      setError("Konfirmasi password tidak cocok.");
+      setFieldErrors({ confirmPassword: "Konfirmasi password tidak cocok." });
       setLoading(false);
       return;
     }
@@ -46,11 +49,14 @@ export default function RegisterPage() {
       }, 2000);
       
     } catch (err: any) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message;
-      if (errorMsg) {
-        setError(errorMsg);
-      } else {
-        setError("Gagal mendaftar. Pastikan data valid.");
+      const data = err.response?.data;
+      const { general, fields } = mapBackendError(data);
+
+      if (Object.keys(fields).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...fields }));
+      }
+      if (general) {
+        setError(general);
       }
     } finally {
       setLoading(false);
@@ -88,42 +94,57 @@ export default function RegisterPage() {
 
               <div className={styles.tagline}>Mulai Aksi Pedulimu Hari Ini</div>
 
-              {error && <div className={styles.errorText}>{error}</div>}
+              {/* {error && <div className={styles.errorText}>{error}</div>} */}
               {success && <div className={styles.errorText} style={{color: '#1a513c', backgroundColor: '#e6f4ea'}}>{success}</div>}
 
               <form className={styles.loginForm} onSubmit={handleRegister}>
-                  <input 
-                    type="text" 
-                    className={styles.inputField} 
-                    placeholder="Nama Lengkap" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required 
-                  />
-                  <input 
-                    type="email" 
-                    className={styles.inputField} 
-                    placeholder="Email Anda" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required 
-                  />
-                  <input 
-                    type="password" 
-                    className={styles.inputField} 
-                    placeholder="Password (Min. 6 Karakter)" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required 
-                  />
-                  <input 
-                    type="password" 
-                    className={styles.inputField} 
-                    placeholder="Konfirmasi Password" 
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required 
-                  />
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="text" 
+                      className={styles.inputField} 
+                      placeholder="Nama Lengkap" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.name && <div className={styles.fieldError}>{fieldErrors.name}</div>}
+                  </div>
+
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="email" 
+                      className={styles.inputField} 
+                      placeholder="Email Anda" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.email && <div className={styles.fieldError}>{fieldErrors.email}</div>}
+                  </div>
+
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="password" 
+                      className={styles.inputField} 
+                      placeholder="Password (Min. 6 Karakter)" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.password && <div className={styles.fieldError}>{fieldErrors.password}</div>}
+                  </div>
+
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="password" 
+                      className={styles.inputField} 
+                      placeholder="Konfirmasi Password" 
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.confirmPassword && <div className={styles.fieldError}>{fieldErrors.confirmPassword}</div>}
+                  </div>
                   <select 
                     className={styles.inputField} 
                     value={role} 

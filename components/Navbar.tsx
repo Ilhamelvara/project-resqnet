@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
+import { useReportModal } from '../contexts/ReportModalContext';
 
 interface NavbarProps {
   searchPlaceholder?: string;
@@ -22,6 +23,7 @@ export default function Navbar({
 }: NavbarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { openModal } = useReportModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -156,7 +158,7 @@ export default function Navbar({
           </nav>
           <div className="pl-4 sticky right-0 bg-gradient-to-l from-[#fcf8ec] via-[#fcf8ec] to-transparent">
              <button 
-               onClick={onButtonClick}
+               onClick={onButtonClick || openModal}
                className="bg-[#f08519] hover:bg-[#d97715] text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
              >
                {buttonText}

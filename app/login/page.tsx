@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import styles from './login.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../utils/api';
+import { mapBackendError } from '../../utils/errorMapper';
 import Head from 'next/head';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
@@ -34,11 +36,14 @@ export default function LoginPage() {
       login(tokens.accessToken, user);
       
     } catch (err: any) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message;
-      if (errorMsg) {
-        setError(errorMsg);
-      } else {
-        setError("Gagal masuk. Periksa kembali email dan password Anda.");
+      const data = err.response?.data;
+      const { general, fields } = mapBackendError(data);
+      
+      if (Object.keys(fields).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...fields }));
+      }
+      if (general) {
+        setError(general);
       }
     } finally {
       setLoading(false);
@@ -80,22 +85,30 @@ export default function LoginPage() {
               {error && <div className={styles.errorText}>{error}</div>}
 
               <form className={styles.loginForm} onSubmit={handleLogin}>
-                  <input 
-                    type="text" 
-                    className={styles.inputField} 
-                    placeholder="Email Anda" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required 
-                  />
-                  <input 
-                    type="password" 
-                    className={styles.inputField} 
-                    placeholder="Password" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required 
-                  />
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="text" 
+                      className={styles.inputField} 
+                      placeholder="Email Anda" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.email && <div className={styles.fieldError}>{fieldErrors.email}</div>}
+                  </div>
+                  
+                  <div className="w-full flex flex-col items-center gap-1">
+                    <input 
+                      type="password" 
+                      className={styles.inputField} 
+                      placeholder="Password" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required 
+                    />
+                    {fieldErrors.password && <div className={styles.fieldError}>{fieldErrors.password}</div>}
+                  </div>
+
                   <button type="submit" className={styles.loginBtn} disabled={loading}>
                     {loading ? 'Memproses...' : 'Masuk'}
                   </button>
