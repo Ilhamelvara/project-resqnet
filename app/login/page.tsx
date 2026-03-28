@@ -20,9 +20,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const normalizedEmail = email.toLowerCase();
       // Use the actual backend endpoint: POST /api/auth/login
       const response = await api.post('/auth/login', {
-        email,
+        email: normalizedEmail,
         password
       });
 

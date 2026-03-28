@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState('USER');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -23,10 +24,17 @@ export default function RegisterPage() {
     setSuccess('');
     setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError("Konfirmasi password tidak cocok.");
+      setLoading(false);
+      return;
+    }
+
     try {
+      const normalizedEmail = email.toLowerCase();
       await api.post('/auth/register', {
         name,
-        email,
+        email: normalizedEmail,
         password,
         role, // Optional backend support: USER, ORG, ADMIN
       });
@@ -106,6 +114,14 @@ export default function RegisterPage() {
                     placeholder="Password (Min. 6 Karakter)" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required 
+                  />
+                  <input 
+                    type="password" 
+                    className={styles.inputField} 
+                    placeholder="Konfirmasi Password" 
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     required 
                   />
                   <select 
