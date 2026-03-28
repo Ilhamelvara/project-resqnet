@@ -15,8 +15,10 @@ import {
   Users,
   Plus,
   Minus,
-  X
+  X,
+  ArrowRight
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Types
 interface Disaster {
@@ -32,6 +34,7 @@ interface Disaster {
 
 export default function PetaBencana() {
   const { user } = useAuth();
+  const router = useRouter();
   
   // Data State
   const [disasters, setDisasters] = useState<Disaster[]>([]);
@@ -348,6 +351,15 @@ export default function PetaBencana() {
                              {format(new Date(d.occurredAt), 'dd MMM yyyy', { locale: id })}
                           </span>
                        </div>
+                       <button 
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           router.push(`/peta/${d.id}`);
+                         }}
+                         className="w-full mt-3 bg-[#1a513c] text-white text-[10px] font-bold py-1.5 rounded hover:bg-[#133c2c] transition-colors flex items-center justify-center gap-1"
+                       >
+                         Lihat Detail <ArrowRight size={10} />
+                       </button>
                     </div>
 
                     <div className={`${bgColor} p-2 rounded-full text-white relative z-10 transition-transform group-hover:scale-110 shadow-md`}>

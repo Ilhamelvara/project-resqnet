@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useReportModal } from '../contexts/ReportModalContext';
+import { useCampaignModal } from '../contexts/CampaignModalContext';
 
 interface NavbarProps {
   searchPlaceholder?: string;
@@ -24,6 +25,7 @@ export default function Navbar({
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { openModal } = useReportModal();
+  const { openCampaignModal } = useCampaignModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -103,16 +105,26 @@ export default function Navbar({
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-[#e5dfc5] rounded-xl shadow-lg py-2 animate-in fade-in zoom-in duration-200 origin-top-right">
+                <div className="z-[100] absolute right-0 mt-2 w-48 bg-white border border-[#e5dfc5] rounded-xl shadow-lg py-2 animate-in fade-in zoom-in duration-200 origin-top-right">
                   <div className="px-4 py-2 border-b border-gray-100 mb-1">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Akun Anda</p>
                     <p className="text-sm font-bold text-[#1a513c] truncate">{user?.name}</p>
-                    <p className="text-[10px] font-medium text-gray-500 truncate">{user?.email}</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <p className="text-[10px] font-medium text-gray-500 truncate flex-1">{user?.email}</p>
+                      {user?.role && (
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border uppercase tracking-tighter ${
+                          user.role === 'ORG' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                          (user.role === 'USER' && user.isVerified) ? 'bg-green-50 text-green-600 border-green-200' :
+                          user.role === 'ADMIN' ? 'bg-red-50 text-red-600 border-red-200' :
+                          'bg-gray-50 text-gray-600 border-gray-200'
+                        }`}>
+                          {user.role === 'ORG' ? 'Organisasi' : 
+                           (user.role === 'USER' && user.isVerified) ? 'Relawan' : 
+                           user.role === 'ADMIN' ? 'Admin' : 'Personal'}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <Link href="/profile" className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-[#fcf8ec] hover:text-[#1a513c] transition-colors">
-                    <User className="w-4 h-4" />
-                    Profil
-                  </Link>
                   <button 
                     onClick={() => {
                       setIsDropdownOpen(false);
@@ -156,7 +168,15 @@ export default function Navbar({
               );
             })}
           </nav>
-          <div className="pl-4 sticky right-0 bg-gradient-to-l from-[#fcf8ec] via-[#fcf8ec] to-transparent">
+          <div className="pl-4 sticky right-0 bg-gradient-to-l from-[#fcf8ec] via-[#fcf8ec] to-transparent flex gap-2">
+             {user?.role === 'ORG' && pathname?.includes('/donasi') && (
+               <button 
+                 onClick={openCampaignModal}
+                 className="bg-[#1a513c] hover:bg-[#154030] text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
+               >
+                 Buat Kampanye
+               </button>
+             )}
              <button 
                onClick={onButtonClick || openModal}
                className="bg-[#f08519] hover:bg-[#d97715] text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-sm hover:shadow active:scale-95 whitespace-nowrap"
